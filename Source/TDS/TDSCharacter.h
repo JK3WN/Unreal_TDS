@@ -7,6 +7,7 @@
 #include "Logging/LogMacros.h"
 #include "AbilitySystemInterface.h"
 #include "InputActionValue.h"
+#include "GameplayAbilitySpec.h"
 #include "TDSCharacter.generated.h"
 
 class USpringArmComponent;
@@ -107,5 +108,16 @@ public:
 protected:
 	UPROPERTY()
 	TWeakObjectPtr<class UAbilitySystemComponent> AbilitySystemComponent;
+	
+	virtual void InitializeAbilities();
+	virtual void InitializeEffects();
+	virtual void ClearGivenAbilities();
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
+	TArray<TSubclassOf<class UTDSGameplayAbility>> DefaultAbilities;
+	TArray<FGameplayAbilitySpecHandle> GivenAbilities;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
+	TArray<TSubclassOf<class UGameplayEffect>> DefaultEffects;
 };
 

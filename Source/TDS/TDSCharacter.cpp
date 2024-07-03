@@ -13,6 +13,7 @@
 #include "AbilitySystemComponent.h"
 #include "TDSPlayerState.h"
 #include "TDS.h"
+#include "TDSGameplayAbility.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -71,7 +72,9 @@ void ATDSCharacter::BeginPlay()
 		}
 
 		PlayerController->SetShowMouseCursor(true);
-		PlayerController->SetInputMode((FInputModeGameAndUI()));
+		FInputModeGameAndUI InputMode;
+		InputMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(InputMode);
 	}
 }
 
@@ -144,11 +147,57 @@ void ATDSCharacter::InitAbilitySystemComponent()
 	AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 }
 
+void ATDSCharacter::InitializeAbilities()
+{
+	// Give Abilities, Server only
+	if(!HasAuthority() || !AbilitySystemComponent.IsValid())
+		return;
+
+	for(TSubclassOf<UTDSGameplayAbility>& Ability : DefaultAbilities)
+	{
+		FGameplayAbilitySpecHandle SpecHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 1, static_cast<int32>(Ability.GetDefaultObject()->AbilityInputID), this));
+		GivenAbilities.Add(SpecHandle);
+	}
+}
+
+void ATDSCharacter::InitializeEffects()
+{
+	if(!AbilitySystemComponent.IsValid())
+		return;
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	for(TSubclassOf<UGameplayEffect>& Effect : DefaultEffects)
+	{
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1, EffectContext);
+		if(SpecHandle.IsValid())
+		{
+			FActiveGameplayEffectHandle GEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+void ATDSCharacter::ClearGivenAbilities()
+{
+	// Give Abilities, Server only
+	if(!HasAuthority() || !AbilitySystemComponent.IsValid())
+		return;
+
+	for(FGameplayAbilitySpecHandle AbilitySpecHandle : GivenAbilities)
+	{
+		AbilitySystemComponent->ClearAbility(AbilitySpecHandle);
+	}
+}
+
+
 void ATDSCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
 	InitAbilitySystemComponent();
+
+	InitializeEffects();
 }
 
 void ATDSCharacter::PossessedBy(AController* NewController)
@@ -156,6 +205,9 @@ void ATDSCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitAbilitySystemComponent();
+
+	InitializeAbilities();
+	InitializeEffects();
 }
 
 void ATDSCharacter::OnPrimaryAbility(const FInputActionValue& Value)
