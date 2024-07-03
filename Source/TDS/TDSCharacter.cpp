@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 #include "AbilitySystemComponent.h"
 #include "TDSPlayerState.h"
+#include "TDS.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -88,6 +89,13 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATDSCharacter::Move);
+
+		EnhancedInputComponent->BindAction(PrimaryAbilityAction, ETriggerEvent::Triggered, this, &ATDSCharacter::OnPrimaryAbility);
+		EnhancedInputComponent->BindAction(SecondaryAbilityAction, ETriggerEvent::Triggered, this, &ATDSCharacter::OnSecondaryAbility);
+		EnhancedInputComponent->BindAction(MovementAbilityAction, ETriggerEvent::Triggered, this, &ATDSCharacter::OnMovementAbility);
+		EnhancedInputComponent->BindAction(UtilityAbilityAction, ETriggerEvent::Triggered, this, &ATDSCharacter::OnUtilityAbility);
+		EnhancedInputComponent->BindAction(WeaponFireAction, ETriggerEvent::Triggered, this, &ATDSCharacter::OnWeaponFire);
+		EnhancedInputComponent->BindAction(WeaponAltAction, ETriggerEvent::Triggered, this, &ATDSCharacter::OnWeaponAlt);
 	}
 	else
 	{
@@ -148,4 +156,49 @@ void ATDSCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitAbilitySystemComponent();
+}
+
+void ATDSCharacter::OnPrimaryAbility(const FInputActionValue& Value)
+{
+	SendAbilityLocalInput(Value, static_cast<int32>(EAbilityInputID::PrimaryAbility));
+}
+
+void ATDSCharacter::OnSecondaryAbility(const FInputActionValue& Value)
+{
+	SendAbilityLocalInput(Value, static_cast<int32>(EAbilityInputID::SecondaryAbility));
+}
+
+void ATDSCharacter::OnMovementAbility(const FInputActionValue& Value)
+{
+	SendAbilityLocalInput(Value, static_cast<int32>(EAbilityInputID::MovementAbility));
+}
+
+void ATDSCharacter::OnUtilityAbility(const FInputActionValue& Value)
+{
+	SendAbilityLocalInput(Value, static_cast<int32>(EAbilityInputID::UtilityAbility));
+}
+
+void ATDSCharacter::OnWeaponFire(const FInputActionValue& Value)
+{
+	SendAbilityLocalInput(Value, static_cast<int32>(EAbilityInputID::WeaponFire));
+}
+
+void ATDSCharacter::OnWeaponAlt(const FInputActionValue& Value)
+{
+	SendAbilityLocalInput(Value, static_cast<int32>(EAbilityInputID::WeaponAlt));
+}
+
+void ATDSCharacter::SendAbilityLocalInput(const FInputActionValue& Value, int32 InputID)
+{
+	if(!AbilitySystemComponent.IsValid())
+		return;
+
+	if(Value.Get<bool>())
+	{
+		AbilitySystemComponent->AbilityLocalInputPressed(InputID);
+	}
+	else
+	{
+		AbilitySystemComponent->AbilityLocalInputReleased(InputID);
+	}
 }

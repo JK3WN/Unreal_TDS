@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "AbilitySystemInterface.h"
+#include "InputActionValue.h"
 #include "TDSCharacter.generated.h"
 
 class USpringArmComponent;
@@ -45,6 +46,24 @@ class ATDSCharacter : public ACharacter, public IAbilitySystemInterface
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* PrimaryAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SecondaryAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MovementAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* UtilityAbilityAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* WeaponFireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* WeaponAltAction;
+
 public:
 	ATDSCharacter();
 	
@@ -53,7 +72,15 @@ protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
-			
+
+	void OnPrimaryAbility(const FInputActionValue& Value);
+	void OnSecondaryAbility(const FInputActionValue& Value);
+	void OnMovementAbility(const FInputActionValue& Value);
+	void OnUtilityAbility(const FInputActionValue& Value);
+	void OnWeaponFire(const FInputActionValue& Value);
+	void OnWeaponAlt(const FInputActionValue& Value);
+
+	virtual void SendAbilityLocalInput(const FInputActionValue& Value, int32 InputID);
 
 protected:
 	// APawn interface
