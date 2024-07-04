@@ -21,6 +21,9 @@ public:
 	// Inherited via IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	class UTDSHealthSet* HealthSet;
+
 protected:
 	UPROPERTY()
 	class UAbilitySystemComponent* AbilitySystemComponent;
