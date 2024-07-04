@@ -14,6 +14,7 @@
 #include "TDSPlayerState.h"
 #include "TDS.h"
 #include "TDSGameplayAbility.h"
+#include "TDSHealthSet.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -76,6 +77,13 @@ void ATDSCharacter::BeginPlay()
 		InputMode.SetHideCursorDuringCapture(false);
 		PlayerController->SetInputMode(InputMode);
 	}
+
+	ATDSPlayerState* PS = GetPlayerState<ATDSPlayerState>();
+	if(!PS)
+		return;
+
+	UTDSHealthSet* HealthSet = PS->HealthSet;
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetHealthAttribute()).AddUObject(this, &ATDSCharacter::OnHealthAttributeChanged);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -188,6 +196,11 @@ void ATDSCharacter::ClearGivenAbilities()
 	{
 		AbilitySystemComponent->ClearAbility(AbilitySpecHandle);
 	}
+}
+
+void ATDSCharacter::OnHealthAttributeChanged(const FOnAttributeChangeData& Data)
+{
+	OnHealthChanged(Data.OldValue, Data.NewValue);
 }
 
 
