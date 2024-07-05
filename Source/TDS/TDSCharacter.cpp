@@ -84,6 +84,7 @@ void ATDSCharacter::BeginPlay()
 
 	UTDSHealthSet* HealthSet = PS->HealthSet;
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetHealthAttribute()).AddUObject(this, &ATDSCharacter::OnHealthAttributeChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetShieldAttribute()).AddUObject(this, &ATDSCharacter::OnShieldAttributeChanged);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -203,6 +204,10 @@ void ATDSCharacter::OnHealthAttributeChanged(const FOnAttributeChangeData& Data)
 	OnHealthChanged(Data.OldValue, Data.NewValue);
 }
 
+void ATDSCharacter::OnShieldAttributeChanged(const FOnAttributeChangeData& Data)
+{
+	OnShieldChanged(Data.OldValue, Data.NewValue);
+}
 
 void ATDSCharacter::OnRep_PlayerState()
 {

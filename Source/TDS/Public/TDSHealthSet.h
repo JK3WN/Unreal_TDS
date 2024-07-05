@@ -26,6 +26,26 @@ public:
 	FGameplayAttributeData MaxHealth;
 	ATTRIBUTE_ACCESSORS(UTDSHealthSet, MaxHealth);
 
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Shield;
+	ATTRIBUTE_ACCESSORS(UTDSHealthSet, Shield);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxShield;
+	ATTRIBUTE_ACCESSORS(UTDSHealthSet, MaxShield);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ShieldRegen;
+	ATTRIBUTE_ACCESSORS(UTDSHealthSet, ShieldRegen);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData ShieldRegenDelay;
+	ATTRIBUTE_ACCESSORS(UTDSHealthSet, ShieldRegenDelay);
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData InDamage;
+	ATTRIBUTE_ACCESSORS(UTDSHealthSet, InDamage);
+
 protected:
 	virtual void ClampAttributeOnChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
 
@@ -34,4 +54,6 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 };
