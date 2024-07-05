@@ -15,6 +15,7 @@
 #include "TDS.h"
 #include "TDSGameplayAbility.h"
 #include "TDSHealthSet.h"
+#include "TDSWeapon.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -85,6 +86,18 @@ void ATDSCharacter::BeginPlay()
 	UTDSHealthSet* HealthSet = PS->HealthSet;
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetHealthAttribute()).AddUObject(this, &ATDSCharacter::OnHealthAttributeChanged);
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(HealthSet->GetShieldAttribute()).AddUObject(this, &ATDSCharacter::OnShieldAttributeChanged);
+
+	UWorld* const World = GetWorld();
+	if(World && DefaultWeaponClass)
+	{
+		FActorSpawnParameters ActorSpawnParams;
+		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		ActorSpawnParams.Owner = this;
+
+		Weapon = World->SpawnActor<ATDSWeapon>(DefaultWeaponClass, GetActorLocation(), GetActorRotation(), ActorSpawnParams);
+		if(Weapon)
+			Weapon->Equip();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
